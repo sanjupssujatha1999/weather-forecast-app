@@ -45,6 +45,7 @@ async function getWeatherByCity(city) {
             // Update the UI with the fetched weather data
             document.getElementById('current-weather').innerText = `Temperature: ${data.main.temp}°C, Weather: ${data.weather[0].description}, Humidity: ${data.main.humidity}%, Wind Speed: ${data.wind.speed} m/s`;
             document.getElementById('weather-icon').src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+            getExtendedForecast(city); // Fetch extended forecast for the city
         } else {
             alert('City not found'); // Alert if the city is not found
         }
@@ -63,12 +64,75 @@ async function getWeatherByLocation(lat, lon) {
             // Update the UI with the fetched weather data
             document.getElementById('current-weather').innerText = `Temperature: ${data.main.temp}°C, Weather: ${data.weather[0].description}, Humidity: ${data.main.humidity}%, Wind Speed: ${data.wind.speed} m/s`;
             document.getElementById('weather-icon').src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+            getExtendedForecastByLocation(lat, lon); // Fetch extended forecast for the location
         } else {
             alert('Location not found'); // Alert if the location is not found
         }
     } catch (error) {
         console.error('Error fetching weather data:', error); // Log any errors
     }
+}
+
+// Fetch extended forecast by city name
+async function getExtendedForecast(city) {
+    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl); // Fetch data from the API
+        const data = await response.json(); // Parse the JSON response
+        if (data.cod === "200") {
+            displayExtendedForecast(data); // Display the extended forecast
+        } else {
+            alert('City not found'); // Alert if the city is not found
+        }
+    } catch (error) {
+        console.error('Error fetching extended forecast data:', error); // Log any errors
+    }
+}
+
+// Fetch extended forecast by geographic coordinates
+async function getExtendedForecastByLocation(lat, lon) {
+    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl); // Fetch data from the API
+        const data = await response.json(); // Parse the JSON response
+        if (data.cod === "200") {
+            displayExtendedForecast(data); // Display the extended forecast
+        } else {
+            alert('Location not found'); // Alert if the location is not found
+        }
+    } catch (error) {
+        console.error('Error fetching extended forecast data:', error); // Log any errors
+    }
+}
+
+// Display the extended forecast
+function displayExtendedForecast(data) {
+    const forecastContainer = document.getElementById('forecast');
+    forecastContainer.innerHTML = ''; // Clear any existing forecast data
+
+    // Filter the forecast data to get one entry per day (at noon)
+    const dailyForecasts = data.list.filter(forecast => forecast.dt_txt.includes('12:00:00'));
+
+    dailyForecasts.forEach(forecast => {
+        const forecastElement = document.createElement('div');
+        forecastElement.classList.add('forecast-day', 'w-full', 'md:w-1/3', 'p-4', 'bg-gray-200', 'm-2', 'rounded');
+
+        const date = new Date(forecast.dt_txt).toLocaleDateString();
+        const iconUrl = `http://openweathermap.org/img/wn/${forecast.weather[0].icon}.png`;
+        const temp = `Temp: ${forecast.main.temp}°C`;
+        const wind = `Wind: ${forecast.wind.speed} m/s`;
+        const humidity = `Humidity: ${forecast.main.humidity}%`;
+
+        forecastElement.innerHTML = `
+            <h3 class="text-xl font-semibold mb-2">${date}</h3>
+            <img src="${iconUrl}" alt="Weather Icon" class="w-12 h-12 mx-auto mb-2">
+            <p>${temp}</p>
+            <p>${wind}</p>
+            <p>${humidity}</p>
+        `;
+
+        forecastContainer.appendChild(forecastElement);
+    });
 }
 
 // Add a city to the recent cities dropdown
