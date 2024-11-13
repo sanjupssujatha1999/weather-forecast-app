@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast Application</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-4">Weather Forecast</h1>
+        <div class="weather-info flex justify-between">
+            <div class="current-weather w-1/2 p-4 bg-white shadow-md rounded">
+                <h2 class="text-2xl font-semibold mb-2">Current Weather</h2>
+                <p id="current-weather" class="text-lg"></p>
+            </div>
+            <div class="forecast w-1/2 p-4 bg-white shadow-md rounded">
+                <h2 class="text-2xl font-semibold mb-2">Extended Forecast</h2>
+                <div id="forecast" class="flex flex-wrap"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
