@@ -9,7 +9,7 @@ document.getElementById('search-button').addEventListener('click', () => {
         getWeatherByCity(city); // Fetch weather data for the entered city
         addRecentCity(city); // Add the city to the recent cities dropdown
     } else {
-        alert('Please enter a city name'); // Alert if the input field is empty
+        displayError('Please enter a city name'); // Display error if the input field is empty
     }
 });
 
@@ -20,10 +20,10 @@ document.getElementById('location-button').addEventListener('click', () => {
             const { latitude, longitude } = position.coords; // Get the user's current location
             getWeatherByLocation(latitude, longitude); // Fetch weather data for the current location
         }, error => {
-            alert('Unable to retrieve your location'); // Alert if unable to get the location
+            displayError('Unable to retrieve your location'); // Display error if unable to get the location
         });
     } else {
-        alert('Geolocation is not supported by your browser'); // Alert if geolocation is not supported
+        displayError('Geolocation is not supported by your browser'); // Display error if geolocation is not supported
     }
 });
 
@@ -40,16 +40,16 @@ async function getWeatherByCity(city) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
     try {
         const response = await fetch(apiUrl); // Fetch data from the API
-        const data = await response.json(); // Parse the JSON response
-        if (data.cod === 200) {
-            // Update the UI with the fetched weather data
-            document.getElementById('current-weather').innerText = `Temperature: ${data.main.temp}°C, Weather: ${data.weather[0].description}, Humidity: ${data.main.humidity}%, Wind Speed: ${data.wind.speed} m/s`;
-            document.getElementById('weather-icon').src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
-            getExtendedForecast(city); // Fetch extended forecast for the city
-        } else {
-            alert('City not found'); // Alert if the city is not found
+        if (!response.ok) {
+            throw new Error('City not found'); // Throw an error if the response is not ok
         }
+        const data = await response.json(); // Parse the JSON response
+        // Update the UI with the fetched weather data
+        document.getElementById('current-weather').innerText = `Temperature: ${data.main.temp}°C, Weather: ${data.weather[0].description}, Humidity: ${data.main.humidity}%, Wind Speed: ${data.wind.speed} m/s`;
+        document.getElementById('weather-icon').src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+        getExtendedForecast(city); // Fetch extended forecast for the city
     } catch (error) {
+        displayError(error.message); // Display the error message to the user
         console.error('Error fetching weather data:', error); // Log any errors
     }
 }
@@ -59,16 +59,16 @@ async function getWeatherByLocation(lat, lon) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
     try {
         const response = await fetch(apiUrl); // Fetch data from the API
-        const data = await response.json(); // Parse the JSON response
-        if (data.cod === 200) {
-            // Update the UI with the fetched weather data
-            document.getElementById('current-weather').innerText = `Temperature: ${data.main.temp}°C, Weather: ${data.weather[0].description}, Humidity: ${data.main.humidity}%, Wind Speed: ${data.wind.speed} m/s`;
-            document.getElementById('weather-icon').src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
-            getExtendedForecastByLocation(lat, lon); // Fetch extended forecast for the location
-        } else {
-            alert('Location not found'); // Alert if the location is not found
+        if (!response.ok) {
+            throw new Error('Location not found'); // Throw an error if the response is not ok
         }
+        const data = await response.json(); // Parse the JSON response
+        // Update the UI with the fetched weather data
+        document.getElementById('current-weather').innerText = `Temperature: ${data.main.temp}°C, Weather: ${data.weather[0].description}, Humidity: ${data.main.humidity}%, Wind Speed: ${data.wind.speed} m/s`;
+        document.getElementById('weather-icon').src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+        getExtendedForecastByLocation(lat, lon); // Fetch extended forecast for the location
     } catch (error) {
+        displayError(error.message); // Display the error message to the user
         console.error('Error fetching weather data:', error); // Log any errors
     }
 }
@@ -78,13 +78,13 @@ async function getExtendedForecast(city) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
     try {
         const response = await fetch(apiUrl); // Fetch data from the API
-        const data = await response.json(); // Parse the JSON response
-        if (data.cod === "200") {
-            displayExtendedForecast(data); // Display the extended forecast
-        } else {
-            alert('City not found'); // Alert if the city is not found
+        if (!response.ok) {
+            throw new Error('City not found'); // Throw an error if the response is not ok
         }
+        const data = await response.json(); // Parse the JSON response
+        displayExtendedForecast(data); // Display the extended forecast
     } catch (error) {
+        displayError(error.message); // Display the error message to the user
         console.error('Error fetching extended forecast data:', error); // Log any errors
     }
 }
@@ -94,13 +94,13 @@ async function getExtendedForecastByLocation(lat, lon) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
     try {
         const response = await fetch(apiUrl); // Fetch data from the API
-        const data = await response.json(); // Parse the JSON response
-        if (data.cod === "200") {
-            displayExtendedForecast(data); // Display the extended forecast
-        } else {
-            alert('Location not found'); // Alert if the location is not found
+        if (!response.ok) {
+            throw new Error('Location not found'); // Throw an error if the response is not ok
         }
+        const data = await response.json(); // Parse the JSON response
+        displayExtendedForecast(data); // Display the extended forecast
     } catch (error) {
+        displayError(error.message); // Display the error message to the user
         console.error('Error fetching extended forecast data:', error); // Log any errors
     }
 }
@@ -133,6 +133,13 @@ function displayExtendedForecast(data) {
 
         forecastContainer.appendChild(forecastElement);
     });
+}
+
+// Display error messages to the user
+function displayError(message) {
+    const errorContainer = document.getElementById('error-message');
+    errorContainer.innerText = message;
+    errorContainer.classList.remove('hidden');
 }
 
 // Add a city to the recent cities dropdown
