@@ -39,4 +39,4 @@ The Weather Forecast Application allows users to search for weather forecasts by
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License..
