@@ -1,6 +1,6 @@
 // script.js
 const apiKey = 'd5838a197007762851ecd7fac1d62b51'; // Your OpenWeatherMap API key
-const recentCities = JSON.parse(localStorage.getItem('recentCities')) || [];
+const recentCities = JSON.parse(localStorage.getItem('recentCities')) || []; // Retrieve recent cities from local storage or initialize an empty array
 
 // Event listener for the search button
 document.getElementById('search-button').addEventListener('click', () => {
